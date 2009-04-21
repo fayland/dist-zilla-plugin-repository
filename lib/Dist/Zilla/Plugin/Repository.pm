@@ -59,6 +59,14 @@ sub _find_repo {
             # XXX Make it public clone URL, but this only works with github
             my $git_url = $1;
             $git_url =~ s![\w\-]+\@([^:]+):!git://$1/!;
+            
+            # Changed
+            # I prefer http://github.com/fayland/dist-zilla-plugin-repository
+            #   than git://github.com/fayland/dist-zilla-plugin-repository.git 
+            if ( $git_url =~ /^git:\/\/(github\.com.*?)\.git$/ ) {
+                $git_url = "http://$1/tree";
+            }
+            
             return $git_url;
         } elsif (`git svn info` =~ /URL: (.*)$/m) {
             return $1;
