@@ -3,7 +3,6 @@ package Dist::Zilla::Plugin::Repository;
 # ABSTRACT: Automatically sets repository URL from svn/svk/Git checkout for Dist::Zilla
 
 use Moose;
-use Moose::Autobox;
 with 'Dist::Zilla::Role::MetaProvider';
 
 =head1 SYNOPSIS
