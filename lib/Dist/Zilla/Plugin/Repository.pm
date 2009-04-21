@@ -4,9 +4,7 @@ package Dist::Zilla::Plugin::Repository;
 
 use Moose;
 use Moose::Autobox;
-with 'Dist::Zilla::Role::InstallTool';
-
-use Dist::Zilla::File::InMemory;
+with 'Dist::Zilla::Role::MetaProvider';
 
 =head1 SYNOPSIS
  
@@ -19,40 +17,16 @@ The code is mostly a copy-paste of L<Module::Install::Repository>
  
 =cut
 
-sub setup_installer {
+sub metadata {
     my ($self, $arg) = @_;
 
-    # check if [MetaYaml] is there
-    my $has_metayml = $self->zilla->plugins
-        ->grep(sub { ref $_ eq 'Dist::Zilla::Plugin::MetaYaml' })->length;
-    if ( $has_metayml ) {
-        
-        my $repo = _find_repo();
-        unless ($repo) {
-            $self->zilla->log("[Repository] Cannot determine repository URL");
-            return 0;
-        }
-        
-        my $file = $self->zilla->files
-             ->grep(sub { $_->name =~ m{META\.yml\z} })
-             ->head;
-        
-        if ( $file ) {
-            my $content = $file->content;
-            require YAML::Syck;
-            my $meta = YAML::Syck::Load($content);
-            $meta->{resources}{repository} = $repo;
-            $file->content( YAML::Syck::Dump($meta) );
-        } else {
-            $self->zilla->log("[Repository] Skip META.yml ([Repository] needs after [MetaYaml]");
-        }
-    }
-
-    return;
+    my $repo = $self->_find_repo();
+    return { resources => { repository => $repo } };
 }
 
 # Copy-Paste of Module-Install-Repository, thank MIYAGAWA
 sub _find_repo {
+  my ($self) = @_;
     if (-e ".git") {
         # TODO support remote besides 'origin'?
         if (`git remote show origin` =~ /URL: (.*)$/m) {
