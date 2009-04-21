@@ -1,4 +1,7 @@
 Revision history for Perl extension Dist-Zilla-Plugin-MetaResources
 
+0.02    2009.04.21
+        use http instead of git for github.com
+
 0.01    2009.04.20
         a start
