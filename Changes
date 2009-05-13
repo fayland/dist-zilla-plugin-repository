@@ -1,4 +1,4 @@
-Revision history for Perl extension Dist-Zilla-Plugin-MetaResources
+Revision history for Perl extension Dist-Zilla-Plugin-Repository
 
 0.07    2009.06.13
         fix use of git-remote show to work offline (rjbs)
