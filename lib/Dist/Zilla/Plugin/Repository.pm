@@ -28,7 +28,7 @@ sub _find_repo {
   my ($self) = @_;
     if (-e ".git") {
         # TODO support remote besides 'origin'?
-        if (`git remote show origin` =~ /URL: (.*)$/m) {
+        if (`git remote show -n origin` =~ /URL: (.*)$/m) {
             # XXX Make it public clone URL, but this only works with github
             my $git_url = $1;
             $git_url =~ s![\w\-]+\@([^:]+):!git://$1/!;
