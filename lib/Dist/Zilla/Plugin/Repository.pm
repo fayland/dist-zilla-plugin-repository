@@ -52,7 +52,11 @@ sub _find_repo {
         }
     } elsif (-e ".svn") {
         if ($execute->('svn info') =~ /URL: (.*)$/m) {
-            return $1;
+            my $svn_url = $1;
+            if( $svn_url =~ /^https(\:\/\/.*?\.googlecode\.com\/svn\/.*)$/ ) {
+                $svn_url = 'http'.$1;
+            }
+            return $svn_url;
         }
     } elsif (-e "_darcs") {
         # defaultrepo is better, but that is more likely to be ssh, not http

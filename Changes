@@ -1,5 +1,8 @@
 Revision history for Perl extension Dist-Zilla-Plugin-Repository
 
+0.09
+        Change private googlecode repository url to the public one
+
 0.08    2009.05.14
         Added Mercurial support From Module-Install-Repository-0.05
 
