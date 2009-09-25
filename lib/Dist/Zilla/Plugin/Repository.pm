@@ -13,8 +13,22 @@ with 'Dist::Zilla::Role::MetaProvider';
 =head1 DESCRIPTION
 
 The code is mostly a copy-paste of L<Module::Install::Repository>
- 
+
+=head1 ATTRIBUTES
+
+=head2 git_remote
+
+This is the name of the remote to use for the public repository (if
+you're using Git).  It defaults, unsurprisingly, to F<origin>.
+
 =cut
+
+has git_remote => (
+  is   => 'ro',
+  isa  => 'Str',
+  default  => 'origin',
+);
+
 
 sub metadata {
     my ($self, $arg) = @_;
@@ -33,8 +47,8 @@ sub _find_repo {
     my ($self, $execute) = @_;
     
     if (-e ".git") {
-        # TODO support remote besides 'origin'?
-        if ($execute->('git remote show -n origin') =~ /URL: (.*)$/m) {
+        if ($execute->('git remote show -n '
+                       . $self->git_remote) =~ /URL: (.*)$/m) {
             # XXX Make it public clone URL, but this only works with github
             my $git_url = $1;
             $git_url =~ s![\w\-]+\@([^:]+):!git://$1/!;
