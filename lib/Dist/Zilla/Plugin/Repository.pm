@@ -57,7 +57,7 @@ sub _find_repo {
             # I prefer http://github.com/fayland/dist-zilla-plugin-repository
             #   than git://github.com/fayland/dist-zilla-plugin-repository.git 
             if ( $git_url =~ /^git:\/\/(github\.com.*?)\.git$/ ) {
-                $git_url = "http://$1/tree";
+                $git_url = "http://$1";
             }
             
             return $git_url;
