@@ -1,5 +1,8 @@
 Revision history for Perl extension Dist-Zilla-Plugin-Repository
 
+0.10    2009.09.26
+        git_remote attribute (madsen)
+
 0.09    2009.08.10
         Change private googlecode repository url to the public one (Moritz Onken)
 

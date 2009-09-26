@@ -19,7 +19,7 @@ The code is mostly a copy-paste of L<Module::Install::Repository>
 =head2 git_remote
 
 This is the name of the remote to use for the public repository (if
-you're using Git).  It defaults, unsurprisingly, to F<origin>.
+you use Git). By default, unsurprisingly, to F<origin>.
 
 =cut
 
@@ -28,7 +28,6 @@ has git_remote => (
   isa  => 'Str',
   default  => 'origin',
 );
-
 
 sub metadata {
     my ($self, $arg) = @_;
