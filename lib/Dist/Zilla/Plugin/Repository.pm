@@ -14,12 +14,16 @@ with 'Dist::Zilla::Role::MetaProvider';
 
 The code is mostly a copy-paste of L<Module::Install::Repository>
 
-=head1 ATTRIBUTES
+=head2 ATTRIBUTES
 
-=head2 git_remote
+=over 4
+
+=item * git_remote
 
 This is the name of the remote to use for the public repository (if
 you use Git). By default, unsurprisingly, to F<origin>.
+
+=back
 
 =cut
 
