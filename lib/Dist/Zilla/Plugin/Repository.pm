@@ -63,6 +63,7 @@ sub _find_repo {
                 $git_url = "http://$1";
             }
             
+            return if $git_url eq 'origin'; # RT 55136
             return $git_url;
         } elsif ($execute->('git svn info') =~ /URL: (.*)$/m) {
             return $1;
