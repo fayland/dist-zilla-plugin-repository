@@ -33,6 +33,12 @@ has git_remote => (
   default  => 'origin',
 );
 
+has github_http => (
+  is   => 'ro',
+  isa  => 'Bool',
+  default  => 0,
+);
+
 sub metadata {
     my ($self, $arg) = @_;
 
@@ -59,7 +65,8 @@ sub _find_repo {
             # Changed
             # I prefer http://github.com/fayland/dist-zilla-plugin-repository
             #   than git://github.com/fayland/dist-zilla-plugin-repository.git 
-            if ( $git_url =~ /^git:\/\/(github\.com.*?)\.git$/ ) {
+            if ( $self->github_http
+              && $git_url =~ /^git:\/\/(github\.com.*?)\.git$/ ) {
                 $git_url = "http://$1";
             }
             
