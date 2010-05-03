@@ -36,7 +36,7 @@ has git_remote => (
 has github_http => (
   is   => 'ro',
   isa  => 'Bool',
-  default  => 0,
+  default  => 1,
 );
 
 sub metadata {
