@@ -23,6 +23,13 @@ The code is mostly a copy-paste of L<Module::Install::Repository>
 This is the name of the remote to use for the public repository (if
 you use Git). By default, unsurprisingly, to F<origin>.
 
+=item * github_http
+
+If the remote is a GitHub repository, uses the http url
+(http://github.com/fayland/dist-zilla-plugin-repository) rather than the actual
+clonable url (git://github.com/fayland/dist-zilla-plugin-repository.git).
+Defaults to true.
+
 =back
 
 =cut
