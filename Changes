@@ -1,5 +1,8 @@
 Revision history for Perl extension Dist-Zilla-Plugin-Repository
 
+0.12    2010.05.03
+        make filtering github urls to http configurable (doy)
+
 0.11    2009.09.26
         fix POD
 
