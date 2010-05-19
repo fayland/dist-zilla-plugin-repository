@@ -50,7 +50,7 @@ sub metadata {
     my ($self, $arg) = @_;
 
     my $repo = $self->_find_repo(\&_execute);
-    return { resources => { repository => $repo } };
+    return { resources => { repository => { url => $repo } } };
 }
 
 sub _execute {
