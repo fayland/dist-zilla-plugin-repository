@@ -1,5 +1,8 @@
 Revision history for Perl extension Dist-Zilla-Plugin-Repository
 
+0.14
+        make repository attr, lazy, changeable (Sawyer X)
+
 0.13    2010.05.19
         bare minimum change for META 2 generation (rjbs)
 
