@@ -30,26 +30,45 @@ If the remote is a GitHub repository, uses the http url
 clonable url (git://github.com/fayland/dist-zilla-plugin-repository.git).
 Defaults to true.
 
+=item * repository
+
+You can set this attribute if you want a specific repository instead of the
+plugin to auto-identify your repository.
+
+An example would be if you're releasing a module from your fork, and you don't
+want it to identify your fork, so you can specify the repository explicitly.
+
 =back
 
 =cut
 
 has git_remote => (
-  is   => 'ro',
-  isa  => 'Str',
-  default  => 'origin',
+  is      => 'ro',
+  isa     => 'Str',
+  default => 'origin',
 );
 
 has github_http => (
-  is   => 'ro',
-  isa  => 'Bool',
-  default  => 1,
+  is      => 'ro',
+  isa     => 'Bool',
+  default => 1,
 );
+
+has 'repository' => (
+    is         => 'ro',
+    isa        => 'Str',
+    lazy_build => 1,
+);
+
+sub _build_repository {
+    my $self = shift;
+    return $self->_find_repo( \&_execute );
+}
 
 sub metadata {
     my ($self, $arg) = @_;
 
-    my $repo = $self->_find_repo(\&_execute);
+    my $repo = $self->repository;
     return { resources => { repository => { url => $repo } } };
 }
 
