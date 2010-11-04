@@ -6,7 +6,7 @@ use Moose;
 with 'Dist::Zilla::Role::MetaProvider';
 
 =head1 SYNOPSIS
- 
+
     # dist.ini
     [Repository]
 
@@ -30,6 +30,10 @@ If the remote is a GitHub repository, uses the http url
 clonable url (git://github.com/fayland/dist-zilla-plugin-repository.git).
 Defaults to true.
 
+You may want to set this to false if you're including a META.json
+file, as Meta 2 has separate keys for machine-readable C<url> and
+human-readable C<web>.  This affects only the C<url> key.
+
 =item * repository
 
 You can set this attribute if you want a specific repository instead of the
@@ -37,6 +41,19 @@ plugin to auto-identify your repository.
 
 An example would be if you're releasing a module from your fork, and you don't
 want it to identify your fork, so you can specify the repository explicitly.
+
+In the L<Meta 2 spec|CPAN::Meta::Spec>, this is the C<url> key.
+
+=item * type
+
+This should be the (lower-case) name of the most common program used
+to work with the repository, e.g. git, svn, cvs, darcs, bzr or hg.
+It's normally determined automatically, but you can override it.
+
+=item * web
+
+This is a URL pointing to a human-usable web front-end for the
+repository.  Currently, only Github repositories get this set automatically.
 
 =back
 
@@ -54,6 +71,25 @@ has github_http => (
   default => 1,
 );
 
+has _found_repo => (
+    is         => 'ro',
+    isa        => 'HashRef',
+    lazy_build => 1,
+);
+
+sub _build__found_repo {
+    my $self = shift;
+    my @info = $self->_find_repo( \&_execute );
+
+    unshift @info, 'url' if @info == 1;
+
+    my %repo = @info;
+
+    $repo{$_} ||= '' for qw(type url web);
+
+    return \%repo;
+}
+
 has 'repository' => (
     is         => 'ro',
     isa        => 'Str',
@@ -61,15 +97,34 @@ has 'repository' => (
 );
 
 sub _build_repository {
-    my $self = shift;
-    return $self->_find_repo( \&_execute );
+    shift->_found_repo->{url};
 }
+
+has type => (
+    is         => 'ro',
+    isa        => 'Str',
+    lazy       => 1,
+    default    => sub { shift->_found_repo->{type} },
+);
+
+has web => (
+    is         => 'ro',
+    isa        => 'Str',
+    lazy       => 1,
+    default    => sub { shift->_found_repo->{web} },
+);
 
 sub metadata {
     my ($self, $arg) = @_;
 
-    my $repo = $self->repository;
-    return { resources => { repository => { url => $repo } } };
+    my %repo;
+    $repo{url}  = $self->repository if $self->repository;
+    $repo{type} = $self->type       if $self->type;
+    $repo{web}  = $self->web        if $self->web;
+
+    return unless $repo{url} or $repo{web};
+
+    return { resources => { repository => \%repo } };
 }
 
 sub _execute {
@@ -80,60 +135,69 @@ sub _execute {
 # Copy-Paste of Module-Install-Repository, thank MIYAGAWA
 sub _find_repo {
     my ($self, $execute) = @_;
-    
+
+    my %repo;
+
     if (-e ".git") {
+        $repo{type} = 'git';
         if ($execute->('git remote show -n '
                        . $self->git_remote) =~ /URL: (.*)$/m) {
             # XXX Make it public clone URL, but this only works with github
             my $git_url = $1;
             $git_url =~ s![\w\-]+\@([^:]+):!git://$1/!;
-            
+
+            if ( $git_url =~ /^git:\/\/(github\.com.*?)\.git$/ ) {
+                $repo{web} = "http://$1";
+            }
+
             # Changed
             # I prefer http://github.com/fayland/dist-zilla-plugin-repository
-            #   than git://github.com/fayland/dist-zilla-plugin-repository.git 
+            #   than git://github.com/fayland/dist-zilla-plugin-repository.git
             if ( $self->github_http
               && $git_url =~ /^git:\/\/(github\.com.*?)\.git$/ ) {
                 $git_url = "http://$1";
             }
-            
-            return if $git_url eq 'origin'; # RT 55136
-            return $git_url;
+
+            $repo{url} = $git_url unless $git_url eq 'origin'; # RT 55136
+            return %repo;
         } elsif ($execute->('git svn info') =~ /URL: (.*)$/m) {
-            return $1;
+            return qw(type svn  url), $1;
         }
     } elsif (-e ".svn") {
+        $repo{type} = 'svn';
         if ($execute->('svn info') =~ /URL: (.*)$/m) {
             my $svn_url = $1;
             if( $svn_url =~ /^https(\:\/\/.*?\.googlecode\.com\/svn\/.*)$/ ) {
                 $svn_url = 'http'.$1;
             }
-            return $svn_url;
+            return %repo, url => $svn_url;
         }
     } elsif (-e "_darcs") {
         # defaultrepo is better, but that is more likely to be ssh, not http
+        $repo{type} = 'darcs';
         if (my $query_repo = $execute->('darcs query repo')) {
             if ($query_repo =~ m!Default Remote: (http://.+)!) {
-                return $1;
+                return %repo, url => $1;
             }
         }
 
         open my $handle, '<', '_darcs/prefs/repos' or return;
         while (<$handle>) {
             chomp;
-            return $_ if m!^http://!;
+            return %repo, url => $_ if m!^http://!;
         }
     } elsif (-e ".hg") {
         if ($execute->('hg paths') =~ /default = (.*)$/m) {
             my $mercurial_url = $1;
             $mercurial_url =~ s!^ssh://hg\@(bitbucket\.org/)!https://$1!;
-            return $mercurial_url;
+            return qw(type hg  url) => $mercurial_url;
         }
     } elsif (-e "$ENV{HOME}/.svk") {
         # Is there an explicit way to check if it's an svk checkout?
         my $svk_info = $execute->('svk info') or return;
         SVK_INFO: {
             if ($svk_info =~ /Mirrored From: (.*), Rev\./) {
-                return $1;
+                return qw(type svn  url) => $1;
             }
 
             if ($svk_info =~ m!Merged From: (/mirror/.*), Rev\.!) {
@@ -150,3 +214,6 @@ __PACKAGE__->meta->make_immutable;
 no Moose;
 
 1;
+
+=for Pod::Coverage
+metadata
