@@ -1,6 +1,6 @@
 Revision history for Perl extension Dist-Zilla-Plugin-Repository
 
-0.15    NOT
+0.15    2010.11.05
         better Meta 2 support: added type & web attrs (cjm)
 
 0.14    2010.09.01
