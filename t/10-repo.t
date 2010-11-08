@@ -106,7 +106,7 @@ sub build_tzil
     push @extra_files, @_ ? shift : '';
   }
 
-  my $tzil = Dist::Zilla::Tester->from_config(
+  my $tzil = Builder->from_config(
     { dist_root => 't/corpus/DZT' },
     {
       add_files => {
