@@ -3,7 +3,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 30;
+use Test::More tests => 34;
 
 use Dist::Zilla::Tester;
 
@@ -323,6 +323,39 @@ sub github_deprecated
       "Auto hg with web"
   );
   ok(!github_deprecated($tzil), "Auto hg with web log message");
+}
+
+#---------------------------------------------------------------------
+$result{'git remote show -n nourl'} = <<'END GIT NOURL';
+* remote nourl
+  Fetch URL: origin
+  Push  URL: origin
+  HEAD branch: (not queried)
+  Remote branches: (status not queried)
+END GIT NOURL
+
+{
+  my $tzil = build_tzil(['git_remote = nourl'], '.git');
+
+  is(
+      $tzil->distmeta->{resources}{repository},
+      undef,
+      "Auto git remote nourl"
+  );
+  ok(!github_deprecated($tzil), "Auto git remote nourl log message");
+}
+
+{
+  my $url = 'git://example.com/example.git';
+  my $tzil = build_tzil(['git_remote = nourl', "repository = $url"], '.git');
+
+  is_deeply(
+      $tzil->distmeta->{resources}{repository},
+      { type => 'git',  url => $url },
+      "Auto git remote nourl with repository"
+  );
+  ok(!github_deprecated($tzil),
+     "Auto git remote nourl with repository log message");
 }
 
 #---------------------------------------------------------------------

@@ -1,6 +1,8 @@
 Revision history for Perl extension Dist-Zilla-Plugin-Repository
 
 0.16    NOT
+        detect repository type even if unable to determine URL (cjm)
+
         deprecate github_http.  It now defaults to false, warns if
         it's turned on, and works by deleting the "url" key. (cjm)
 

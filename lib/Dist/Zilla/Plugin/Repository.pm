@@ -168,9 +168,8 @@ sub _find_repo {
             } # end if Github repository
 
         } elsif ($execute->('git svn info') =~ /URL: (.*)$/m) {
-            return qw(type svn  url), $1;
+            %repo = (qw(type svn  url), $1);
         }
-        return %repo;
     } elsif (-e ".svn") {
         $repo{type} = 'svn';
         if ($execute->('svn info') =~ /URL: (.*)$/m) {
@@ -178,7 +177,7 @@ sub _find_repo {
             if( $svn_url =~ /^https(\:\/\/.*?\.googlecode\.com\/svn\/.*)$/ ) {
                 $svn_url = 'http'.$1;
             }
-            return %repo, url => $svn_url;
+            $repo{url} = $svn_url;
         }
     } elsif (-e "_darcs") {
         # defaultrepo is better, but that is more likely to be ssh, not http
@@ -195,10 +194,11 @@ sub _find_repo {
             return %repo, url => $_ if m!^http://!;
         }
     } elsif (-e ".hg") {
+        $repo{type} = 'hg';
         if ($execute->('hg paths') =~ /default = (.*)$/m) {
             my $mercurial_url = $1;
             $mercurial_url =~ s!^ssh://hg\@(bitbucket\.org/)!https://$1!;
-            return qw(type hg  url) => $mercurial_url;
+            $repo{url} = $mercurial_url;
         }
     } elsif (-e "$ENV{HOME}/.svk") {
         # Is there an explicit way to check if it's an svk checkout?
@@ -213,9 +213,9 @@ sub _find_repo {
                 redo SVK_INFO;
             }
         }
-
-        return;
     }
+
+    return %repo;
 }
 
 __PACKAGE__->meta->make_immutable;
