@@ -3,7 +3,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 14;
+use Test::More tests => 30;
 
 use Dist::Zilla::Tester;
 
@@ -121,11 +121,18 @@ sub build_tzil
   return $tzil;
 } # end build_tzil
 
+#---------------------------------------------------------------------
+sub github_deprecated
+{
+  scalar grep { /github_http is deprecated/ } @{ shift->log_messages };
+} # end github_deprecated
+
 #=====================================================================
 {
   my $tzil = build_tzil();
 
   is($tzil->distmeta->{resources}{repository}, undef, "No repository");
+  ok(!github_deprecated($tzil), "No repository log message");
 }
 
 #---------------------------------------------------------------------
@@ -136,6 +143,7 @@ sub build_tzil
 
   is_deeply($tzil->distmeta->{resources}{repository},
             { url => $url }, "Just a URL");
+  ok(!github_deprecated($tzil), "Just a URL log message");
 }
 
 #---------------------------------------------------------------------
@@ -146,6 +154,7 @@ sub build_tzil
 
   is_deeply($tzil->distmeta->{resources}{repository},
             { url => $url, type => 'svn' }, "SVN with type");
+  ok(!github_deprecated($tzil), "SVN with type log message");
 }
 
 #---------------------------------------------------------------------
@@ -159,6 +168,7 @@ sub build_tzil
       $tzil->distmeta->{resources}{repository},
       { web => $web, url => $url, type => 'svn' }, "SVN with type and web"
   );
+  ok(!github_deprecated($tzil), "SVN with type and web log message");
 }
 
 #---------------------------------------------------------------------
@@ -168,10 +178,24 @@ sub build_tzil
   is_deeply(
       $tzil->distmeta->{resources}{repository},
       { type => 'git',
-        url => 'http://github.com/fayland/dist-zilla-plugin-repository',
+        url => 'git://github.com/fayland/dist-zilla-plugin-repository.git',
         web => 'http://github.com/fayland/dist-zilla-plugin-repository' },
       "Auto github"
   );
+  ok(!github_deprecated($tzil), "Auto github log message");
+}
+
+#---------------------------------------------------------------------
+{
+  my $tzil = build_tzil(['github_http = 1'], '.git');
+
+  is_deeply(
+      $tzil->distmeta->{resources}{repository},
+      { type => 'git',
+        web => 'http://github.com/fayland/dist-zilla-plugin-repository' },
+      "Auto github with http"
+  );
+  ok(github_deprecated($tzil), "Auto github with http log message");
 }
 
 #---------------------------------------------------------------------
@@ -185,6 +209,21 @@ sub build_tzil
         web => 'http://github.com/fayland/dist-zilla-plugin-repository' },
       "Auto github no http"
   );
+  ok(!github_deprecated($tzil), "Auto github no http log message");
+}
+
+#---------------------------------------------------------------------
+{
+  my $tzil = build_tzil(['git_remote = dzil', 'github_http = 1'], '.git');
+
+  is_deeply(
+      $tzil->distmeta->{resources}{repository},
+      { type => 'git',
+        web => 'http://github.com/rjbs/dist-zilla' },
+      "Auto github remote dzil with github_http"
+  );
+  ok(github_deprecated($tzil),
+     "Auto github remote dzil with github_http log message");
 }
 
 #---------------------------------------------------------------------
@@ -194,23 +233,11 @@ sub build_tzil
   is_deeply(
       $tzil->distmeta->{resources}{repository},
       { type => 'git',
-        url => 'http://github.com/rjbs/dist-zilla',
-        web => 'http://github.com/rjbs/dist-zilla' },
-      "Auto github remote dzil"
-  );
-}
-
-#---------------------------------------------------------------------
-{
-  my $tzil = build_tzil(['git_remote = dzil', 'github_http = 0'], '.git');
-
-  is_deeply(
-      $tzil->distmeta->{resources}{repository},
-      { type => 'git',
         url => 'git://github.com/rjbs/dist-zilla.git',
         web => 'http://github.com/rjbs/dist-zilla' },
       "Auto github remote dzil no http"
   );
+  ok(!github_deprecated($tzil), "Auto github remote dzil no http log message");
 }
 
 #---------------------------------------------------------------------
@@ -223,6 +250,7 @@ sub build_tzil
         url => 'http://example.com/svn/trunk/my-project' },
       "Auto svn"
   );
+  ok(!github_deprecated($tzil), "Auto svn log message");
 }
 
 #---------------------------------------------------------------------
@@ -237,6 +265,7 @@ sub build_tzil
         url => 'http://example.com/svn/trunk/my-project' },
       "Auto svn with web"
   );
+  ok(!github_deprecated($tzil), "Auto svn with web log message");
 }
 
 #---------------------------------------------------------------------
@@ -249,6 +278,7 @@ sub build_tzil
         url => 'http://example.com/darcs' },
       "Auto darcs from default remote"
   );
+  ok(!github_deprecated($tzil), "Auto darcs from default remote log message");
 }
 
 #---------------------------------------------------------------------
@@ -266,6 +296,7 @@ sub build_tzil
       { type => 'darcs', url => $url },
       "Auto darcs from prefs/repos"
   );
+  ok(!github_deprecated($tzil), "Auto darcs from prefs/repos log message");
 }
 
 #---------------------------------------------------------------------
@@ -277,6 +308,7 @@ sub build_tzil
       { type => 'hg', url => 'https://foobar.googlecode.com/hg/' },
       "Auto hg"
   );
+  ok(!github_deprecated($tzil), "Auto hg log message");
 }
 
 #---------------------------------------------------------------------
@@ -290,6 +322,7 @@ sub build_tzil
         url => 'https://foobar.googlecode.com/hg/' },
       "Auto hg with web"
   );
+  ok(!github_deprecated($tzil), "Auto hg with web log message");
 }
 
 #---------------------------------------------------------------------

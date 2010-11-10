@@ -25,14 +25,19 @@ you use Git). By default, unsurprisingly, to F<origin>.
 
 =item * github_http
 
-If the remote is a GitHub repository, uses the http url
-(http://github.com/fayland/dist-zilla-plugin-repository) rather than the actual
+B<This attribute is deprecated.>
+If the remote is a GitHub repository, list only the http url
+(http://github.com/fayland/dist-zilla-plugin-repository) and not the actual
 clonable url (git://github.com/fayland/dist-zilla-plugin-repository.git).
-Defaults to true.
+This used to default to true, but as of 0.16 it defaults to false.
 
-You may want to set this to false if you're including a META.json
-file, as Meta 2 has separate keys for machine-readable C<url> and
-human-readable C<web>.  This affects only the C<url> key.
+The CPAN Meta 2 spec defines separate keys for the clonable C<url> and
+web front-end C<web>.  The Meta 1 specs allowed only 1 URL.  If you
+set C<github_http> to true, the C<url> key will be removed from the v2
+metadata, and the v1 metadata will then use the C<web> key.
+
+Instead of setting C<github_http>, you should use the MetaJSON plugin
+to include a v2 META.json file with both URLs.
 
 =item * repository
 
@@ -68,7 +73,7 @@ has git_remote => (
 has github_http => (
   is      => 'ro',
   isa     => 'Bool',
-  default => 1,
+  default => 0,
 );
 
 has _found_repo => (
@@ -146,23 +151,26 @@ sub _find_repo {
             my $git_url = $1;
             $git_url =~ s![\w\-]+\@([^:]+):!git://$1/!;
 
+            $repo{url} = $git_url unless $git_url eq 'origin'; # RT 55136
+
             if ( $git_url =~ /^git:\/\/(github\.com.*?)\.git$/ ) {
                 $repo{web} = "http://$1";
-            }
 
-            # Changed
-            # I prefer http://github.com/fayland/dist-zilla-plugin-repository
-            #   than git://github.com/fayland/dist-zilla-plugin-repository.git
-            if ( $self->github_http
-              && $git_url =~ /^git:\/\/(github\.com.*?)\.git$/ ) {
-                $git_url = "http://$1";
-            }
+                if ($self->github_http) {
+                  # I prefer http://github.com/user/repository
+                  # to git://github.com/user/repository.git
+                  delete $repo{url};
+                  $self->log("github_http is deprecated.  ".
+                             "Consider using META.json instead,\n".
+                             "which can store URLs for both git clone ".
+                             "and the web front-end.");
+              } # end if github_http
+            } # end if Github repository
 
-            $repo{url} = $git_url unless $git_url eq 'origin'; # RT 55136
-            return %repo;
         } elsif ($execute->('git svn info') =~ /URL: (.*)$/m) {
             return qw(type svn  url), $1;
         }
+        return %repo;
     } elsif (-e ".svn") {
         $repo{type} = 'svn';
         if ($execute->('svn info') =~ /URL: (.*)$/m) {

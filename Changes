@@ -1,5 +1,16 @@
 Revision history for Perl extension Dist-Zilla-Plugin-Repository
 
+0.16    NOT
+        deprecate github_http.  It now defaults to false, warns if
+        it's turned on, and works by deleting the "url" key. (cjm)
+
+        If you want search.cpan.org to show a link to the Github
+        repository browser, leave github_http false and use the
+        MetaJSON plugin.  The CPAN Meta 2 standard allows for links to
+        both the git clone URL and a web front-end.  You can continue
+        to use the MetaYAML plugin to provide a v1.4 META.yml for
+        CPAN clients that don't yet handle the v2 standard.
+
 0.15    2010.11.05
         better Meta 2 support: added type & web attrs (cjm)
 
