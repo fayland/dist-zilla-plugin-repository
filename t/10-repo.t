@@ -11,6 +11,9 @@ use Dist::Zilla::Tester;
 # Fake execution of VCS commands:
 
 use Dist::Zilla::Plugin::Repository; # make sure it's already loaded
+use File::Temp qw/tempdir/;
+local $ENV{HOME} = tempdir( CLEANUP => 1 );
+
 
 my %result;
 
