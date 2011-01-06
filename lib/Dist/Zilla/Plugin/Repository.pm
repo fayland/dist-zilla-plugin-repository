@@ -170,6 +170,11 @@ sub _find_repo {
         } elsif ($execute->('git svn info') =~ /URL: (.*)$/m) {
             %repo = (qw(type svn  url), $1);
         }
+        # invalid github remote might come back with just the remote name
+        if ( $repo{url} && $repo{url} =~ /\A\w+\z/ ) {
+          delete $repo{$_} for qw/url type web/;
+          $self->log("Skipping invalid git remote " . $self->git_remote);
+        }
     } elsif (-e ".svn") {
         $repo{type} = 'svn';
         if ($execute->('svn info') =~ /URL: (.*)$/m) {
