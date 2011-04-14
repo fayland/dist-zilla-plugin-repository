@@ -153,7 +153,7 @@ sub _find_repo {
 
             $repo{url} = $git_url unless $git_url eq 'origin'; # RT 55136
 
-            if ( $git_url =~ /^git:\/\/(github\.com.*?)\.git$/ ) {
+            if ( $git_url =~ /^(?:git|https?):\/\/(github\.com.*?)\.git$/ ) {
                 $repo{web} = "http://$1";
 
                 if ($self->github_http) {
