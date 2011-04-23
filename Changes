@@ -1,5 +1,8 @@
 Revision history for Perl extension Dist-Zilla-Plugin-Repository
 
+0.18    2011.04.23
+        Match github urls using git: http: or https: schemes (magnificent-tears)
+
 0.17    2011.01.06
         Guard against invalid github remote (dagolden)
         Guard tests against a user's ~/.svk directory (dagolden)
