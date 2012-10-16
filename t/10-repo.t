@@ -187,7 +187,7 @@ sub remote_not_found
       $tzil->distmeta->{resources}{repository},
       { type => 'git',
         url => 'git://github.com/fayland/dist-zilla-plugin-repository.git',
-        web => 'http://github.com/fayland/dist-zilla-plugin-repository' },
+        web => 'https://github.com/fayland/dist-zilla-plugin-repository' },
       "Auto github"
   );
   ok(!github_deprecated($tzil), "Auto github log message");
@@ -200,7 +200,7 @@ sub remote_not_found
   is_deeply(
       $tzil->distmeta->{resources}{repository},
       { type => 'git',
-        web => 'http://github.com/fayland/dist-zilla-plugin-repository' },
+        web => 'https://github.com/fayland/dist-zilla-plugin-repository' },
       "Auto github with http"
   );
   ok(github_deprecated($tzil), "Auto github with http log message");
@@ -214,7 +214,7 @@ sub remote_not_found
       $tzil->distmeta->{resources}{repository},
       { type => 'git',
         url => 'git://github.com/fayland/dist-zilla-plugin-repository.git',
-        web => 'http://github.com/fayland/dist-zilla-plugin-repository' },
+        web => 'https://github.com/fayland/dist-zilla-plugin-repository' },
       "Auto github no http"
   );
   ok(!github_deprecated($tzil), "Auto github no http log message");
@@ -227,7 +227,7 @@ sub remote_not_found
   is_deeply(
       $tzil->distmeta->{resources}{repository},
       { type => 'git',
-        web => 'http://github.com/rjbs/dist-zilla' },
+        web => 'https://github.com/rjbs/dist-zilla' },
       "Auto github remote dzil with github_http"
   );
   ok(github_deprecated($tzil),
@@ -242,7 +242,7 @@ sub remote_not_found
       $tzil->distmeta->{resources}{repository},
       { type => 'git',
         url => 'git://github.com/rjbs/dist-zilla.git',
-        web => 'http://github.com/rjbs/dist-zilla' },
+        web => 'https://github.com/rjbs/dist-zilla' },
       "Auto github remote dzil no http"
   );
   ok(!github_deprecated($tzil), "Auto github remote dzil no http log message");
