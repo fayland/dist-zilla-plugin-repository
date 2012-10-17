@@ -1,6 +1,6 @@
 Revision history for Perl extension Dist-Zilla-Plugin-Repository
 
-0.19
+0.19    2012.10.17
         Use https:// URLs for Github. (DOLMEN)
 
 0.18    2011.04.23
