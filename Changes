@@ -1,5 +1,8 @@
 Revision history for Perl extension Dist-Zilla-Plugin-Repository
 
+0.19
+        Use https:// URLs for Github. (DOLMEN)
+
 0.18    2011.04.23
         Match github urls using git: http: or https: schemes (magnificent-tears)
 
