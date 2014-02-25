@@ -1,5 +1,8 @@
 Revision history for Perl extension Dist-Zilla-Plugin-Repository
 
+0.20    2013-02-25
+        $ENV{LC_ALL} = "C"; from jquelin
+
 0.19    2012.10.17
         Use https:// URLs for Github. (DOLMEN)
 

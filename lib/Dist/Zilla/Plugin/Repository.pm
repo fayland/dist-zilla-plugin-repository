@@ -134,6 +134,7 @@ sub metadata {
 
 sub _execute {
     my ($command) = @_;
+    $ENV{LC_ALL} = "C";
     `$command`;
 }
 
