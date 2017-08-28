@@ -81,6 +81,32 @@ $result{'hg paths'} = <<'END HG';
 default = https://foobar.googlecode.com/hg/
 END HG
 
+$result{'git remote show -n gitlab'} = <<'END GITLAB';
+* remote origin
+  Fetch URL: git@gitlab.com:foo/bar
+  Push  URL: git@gitlab.com:foo/bar
+  HEAD branch: (not queried)
+  Remote branch: (status not queried)
+    master
+  Local branch configured for 'git pull':
+    master merges with remote master
+  Local ref configured for 'git push' (status not queried):
+    (matching) pushes to (matching)
+END GITLAB
+
+$result{'git remote show -n bitbucket'} = <<'END BITBUCKET';
+* remote origin
+  Fetch URL: git@bitbucket.org:foo/bar
+  Push  URL: git@bitbucket.org:foo/bar
+  HEAD branch: (not queried)
+  Remote branch: (status not queried)
+    master
+  Local branch configured for 'git pull':
+    master merges with remote master
+  Local ref configured for 'git push' (status not queried):
+    (matching) pushes to (matching)
+END BITBUCKET
+
 #---------------------------------------------------------------------
 sub make_ini
 {
@@ -179,6 +205,7 @@ sub remote_not_found
   ok(!github_deprecated($tzil), "SVN with type and web log message");
 }
 
+
 #---------------------------------------------------------------------
 {
   my $tzil = build_tzil([], '.git');
@@ -247,6 +274,35 @@ sub remote_not_found
   );
   ok(!github_deprecated($tzil), "Auto github remote dzil no http log message");
 }
+
+#---------------------------------------------------------------------
+{
+  my $tzil = build_tzil(['git_remote = gitlab'], '.git');
+
+  is_deeply(
+      $tzil->distmeta->{resources}{repository},
+      { type => 'git',
+        url => 'git://gitlab.com/foo/bar',
+        web => 'https://gitlab.com/foo/bar' },
+      "Auto gitlab"
+  );
+  ok(!github_deprecated($tzil), "Auto gitlab log message");
+}
+
+#---------------------------------------------------------------------
+{
+  my $tzil = build_tzil(['git_remote = bitbucket'], '.git');
+
+  is_deeply(
+      $tzil->distmeta->{resources}{repository},
+      { type => 'git',
+        url => 'git://bitbucket.org/foo/bar',
+        web => 'https://bitbucket.org/foo/bar' },
+      "Auto bitbucket"
+  );
+  ok(!github_deprecated($tzil), "Auto bitbucket log message");
+}
+
 
 #---------------------------------------------------------------------
 {

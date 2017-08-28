@@ -150,11 +150,12 @@ sub _find_repo {
                        . $self->git_remote) =~ /URL: (.*)$/m) {
             # XXX Make it public clone URL, but this only works with github
             my $git_url = $1;
+
             $git_url =~ s![\w\-]+\@([^:]+):!git://$1/!;
 
             $repo{url} = $git_url unless $git_url eq 'origin'; # RT 55136
 
-            if ( $git_url =~ /^(?:git|https?):\/\/(github\.com.*?)\.git$/ ) {
+            if ( $git_url =~ /^(?:git|https?):\/\/((?:git(?:lab|hub)\.com|bitbucket.org).*?)(?:\.git)?$/ ) {
                 $repo{web} = "https://$1";
 
                 if ($self->github_http) {
