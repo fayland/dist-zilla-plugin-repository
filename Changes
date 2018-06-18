@@ -1,5 +1,8 @@
 Revision history for Perl extension Dist-Zilla-Plugin-Repository
 
+0.23    2018-06-18
+        Added missing prereq Moose as suggested by CPANTS. #8 (manwar)
+
 0.22    2018-06-18
         Create correct metadata with only a repository (waterkip)
 
